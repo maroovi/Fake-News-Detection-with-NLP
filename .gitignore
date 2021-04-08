@@ -1,0 +1,11 @@
+*.class
+*.log
+
+target/
+project/target/
+
+
+*.iml
+.idea/
+.null/
+.bsp/
