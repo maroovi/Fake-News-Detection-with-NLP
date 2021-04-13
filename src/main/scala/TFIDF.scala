@@ -17,39 +17,25 @@ object TFIDF extends App {
     .appName("TFIDF")
     .getOrCreate()
 
-  val dfs = create_dataframe()
+  sparkSession.sparkContext.setLogLevel("ERROR")
 
-  val test_with_no_punct: Seq[String] = dfs.collect().map(_.getString(3).replaceAll("https?://\\S+\\s?", "").
+  val df = create_dataframe()
+
+  val test_with_no_punct: Seq[String] = df.collect().map(_.getString(3).replaceAll("https?://\\S+\\s?", "").
     replaceAll("""[\p{Punct}]""", "")).toSeq
 
   ///////
 
-  val rdd: RDD[String] = sparkSession.sparkContext.parallelize(test_with_no_punct)
-  val rdd_train: RDD[Row] = dfs.rdd.zip(rdd).map(r => Row.fromSeq(r._1.toSeq ++ Seq(r._2)))
-  val df = sparkSession.createDataFrame(rdd_train, dfs.schema.add("new_text", StringType))
-
-  SQLConf.get.setConfString("LEGACY_ALLOW_UNTYPED_SCALA_UDF","true")
-
-
-
-  //val title_tokenizer_word = new Tokenizer().setInputCol("title").setOutputCol("title_words")
-
-  //val title_tokenized = title_tokenizer_word.transform(df)
-
-  //title_tokenized.select("title","title_words").withColumn("tokens",countTokens_train(col("title_words")) )
-
   val countTokens_train:UserDefinedFunction = udf { (words: Seq[String]) => words.length }
 
   val title_tokenizer = new RegexTokenizer() // Extract tokens from title
-    .setInputCol("new_text")
+    .setInputCol("title")
     .setOutputCol("title_words")
     .setPattern("\\W")
 
   val title_token_df: DataFrame = title_tokenizer.transform(df)
 
-  title_token_df.select("new_text","title_words").withColumn("tokens",countTokens_train(col("title_words"))).show(false)
-
-  ///////////////////////
+  title_token_df.select("title","title_words").withColumn("tokens",countTokens_train(col("title_words"))).show(false)
 
   val title_sw_remover = new StopWordsRemover() // Remove stop words from title
     .setInputCol("title_words")
@@ -59,11 +45,8 @@ object TFIDF extends App {
 
   val title_sw_remover_df: DataFrame = title_sw_remover.transform(title_token_df).withColumn("tokens", countTokens_train(col("title_sw_removed")))
 
-  ///////////////
-
-
   val title_count_vectorizer: CountVectorizerModel = new CountVectorizer() // Compute Term frequency from title
-    .setInputCol("title_tokenizer")
+    .setInputCol("title_sw_removed")
     .setOutputCol("tf_title")
     .setVocabSize(3)
     .setMinDF(2)

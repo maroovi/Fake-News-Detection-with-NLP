@@ -10,10 +10,16 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       guice,
       "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
-      "org.scalatest" %% "scalatest" % "3.2.3" % "test",
-      "org.apache.spark" %% "spark-core" % "3.0.1",
-      "org.apache.spark" %% "spark-sql" % "3.0.1",
-      "org.apache.spark" %% "spark-mllib" % "2.4.0"
+      //"org.apache.spark" %% "spark-core" % "3.0.1",
+      //"org.apache.spark" %% "spark-sql" % "3.0.1",
+      "org.apache.spark" %% "spark-mllib" % "2.4.0",
+      "org.scalatest" %% "scalatest" % "3.2.2" % "test",
+      "org.apache.spark" %% "spark-core" % "2.4.0",
+      "org.apache.spark" %% "spark-sql" % "2.4.0",
+      "org.apache.bahir" %% "spark-streaming-twitter" % "2.4.0",
+      "org.twitter4j" % "twitter4j-core" % "4.0.4",
+      "org.twitter4j" % "twitter4j-stream" % "4.0.4"
+
     ),
     scalacOptions ++= Seq(
       "-feature",
