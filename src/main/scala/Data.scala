@@ -15,14 +15,15 @@ object Data extends App{
       .options(Map("header" -> "true", "quote" -> "\"", "escape" -> "\""))
       .csv("src/test/scala/resources/datasets/fake.csv")
 
-    real.withColumn("target", lit("real"))
-    fake.withColumn("target", lit("fake"))
+    //real.withColumn("target", lit(0))
+    //fake.withColumn("target", lit(1))
 
-    val total_data = real//real.union(fake)
+    val total_data = real.withColumn("target", lit(0))//.union(fake.withColumn("target", lit(1)))
 
     total_data.select("subject").distinct().show()
     println(total_data.count())
 
     total_data
   }
+  create_dataframe().show(10)
 }
