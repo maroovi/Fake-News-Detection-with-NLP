@@ -7,7 +7,8 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import Data._
 import org.apache.spark.ml.Pipeline
-import org.apache.spark.ml.classification.RandomForestClassifier
+import org.apache.spark.ml.classification.{RandomForestClassificationModel, RandomForestClassifier}
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.StringType
@@ -130,4 +131,17 @@ object TFIDF extends App {
   val predictions = model.transform(test_data)
 
   predictions.show(10)
+
+  val evaluater = new MulticlassClassificationEvaluator().setLabelCol("target").setPredictionCol("fake_predict").setMetricName("accuracy")
+
+  val accuracy = evaluater.evaluate(predictions)
+
+  println(accuracy)
+
+  //val rfModel = model.stages(2).asInstanceOf[RandomForestClassificationModel].write.overwrite.save("src/test/scala/resources/model/myRandomForestClassificationModel")
+
+  //sparkSession.sparkContext.parallelize(Seq(model),1).saveAsObjectFile("src/test/scala/resources/model/RFC")
+  //println(s"Learned classification forest model:\n ${rfModel.toDebugString}")
+
+  model.save("src/test/scala/resources/model/myRandomForestClassificationModels")
 }

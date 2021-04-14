@@ -21,6 +21,7 @@ lazy val root = (project in file("."))
       "org.twitter4j" % "twitter4j-stream" % "4.0.4"
 
     ),
+    dependencyOverrides += "com.google.guava" % "guava" % "15.0",
     scalacOptions ++= Seq(
       "-feature",
       "-deprecation",
