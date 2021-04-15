@@ -1,5 +1,5 @@
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.lit
+import org.apache.spark.sql.{DataFrame, SparkSession}
 object Data extends App{
   def create_dataframe():DataFrame = {
     val session = SparkSession.builder()
@@ -18,9 +18,10 @@ object Data extends App{
     //real.withColumn("target", lit(0))
     //fake.withColumn("target", lit(1))
 
-    val total_data = real.withColumn("target", lit(0))//.union(fake.withColumn("target", lit(1)))
+    val total_data = real.withColumn("target", lit(0)).union(fake.withColumn("target", lit(1)))
 
     total_data.select("subject").distinct().show()
+
     println(total_data.count())
 
     total_data
