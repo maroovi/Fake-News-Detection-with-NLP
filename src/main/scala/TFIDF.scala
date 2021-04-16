@@ -7,7 +7,7 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import Data._
 import org.apache.spark.ml.Pipeline
-import org.apache.spark.ml.classification.{RandomForestClassificationModel, RandomForestClassifier}
+import org.apache.spark.ml.classification.{NaiveBayes, RandomForestClassificationModel, RandomForestClassifier}
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.internal.SQLConf
@@ -136,12 +136,40 @@ object TFIDF extends App {
 
   val accuracy = evaluater.evaluate(predictions)
 
-  println(accuracy)
+  println("Random Forest Accuracy = "+accuracy)
 
+  ////////////////////////////////////////////
   //val rfModel = model.stages(2).asInstanceOf[RandomForestClassificationModel].write.overwrite.save("src/test/scala/resources/model/myRandomForestClassificationModel")
 
   //sparkSession.sparkContext.parallelize(Seq(model),1).saveAsObjectFile("src/test/scala/resources/model/RFC")
   //println(s"Learned classification forest model:\n ${rfModel.toDebugString}")
 
-  model.save("src/test/scala/resources/model/myRandomForestClassificationModels")
+  //model.save("src/test/scala/resources/model/myRandomForestClassificationModels") --- TO SAVE THE MODEL
+
+
+  ///////// Naive Bayes
+
+  val nv = new NaiveBayes().setLabelCol("target").setFeaturesCol("features")
+
+  val nv_pipeline = new Pipeline().setStages(Array(indexer,assembler,nv))
+
+
+  val nv_model = nv_pipeline.fit(train_data)
+
+  val nv_prediction = nv_model.transform(test_data)
+
+  println("Navie Bayes Model")
+  println("")
+  nv_prediction.show(10)
+
+
+  val nv_evaluater = new MulticlassClassificationEvaluator().setLabelCol("target").setPredictionCol("prediction").setMetricName("accuracy")
+
+
+  val nv_accuracy = nv_evaluater.evaluate(nv_prediction)
+
+  println(nv_accuracy)
+
+  nv_model.write.overwrite().save("src/test/scala/resources/model/NaiveBayes")
+
 }
