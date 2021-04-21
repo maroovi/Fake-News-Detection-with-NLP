@@ -11,6 +11,9 @@ lazy val root = (project in file("."))
       guice,
       "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
       "org.scalatest" %% "scalatest" % "3.2.3" % "test",
+      "org.apache.spark" %% "spark-core" % "2.4.0",
+      "org.apache.spark" %% "spark-mllib" % "2.4.0",
+      "org.apache.spark" %% "spark-sql" % "2.4.0",
     ),
     scalacOptions ++= Seq(
       "-feature",
