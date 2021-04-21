@@ -26,7 +26,8 @@ object TFIDF{
   def naiveBayes(dataFrame: DataFrame,indexer: StringIndexer,assembler: VectorAssembler): Unit ={
     val Array(train_data, test_data) = dataFrame.randomSplit(Array(0.7,0.3))
     val nb = new NaiveBayes().setLabelCol("target").setFeaturesCol("features")
-    val pipeline = new Pipeline().setStages(Array(indexer,assembler,nb))
+    //val pipeline = new Pipeline().setStages(Array(indexer,assembler,nb))
+    val pipeline = new Pipeline().setStages(Array(assembler,nb))
     val model = pipeline.fit(train_data)
 
     val predictions = model.transform(test_data)
@@ -53,10 +54,11 @@ object TFIDF{
       .setLabelCol("target")
       .setFeaturesCol("features")
       .setNumTrees(20)
-      .setPredictionCol("fake_predict")
+      .setPredictionCol("prediction")
       .setMaxDepth(7)
 
-    val pipeline = new Pipeline().setStages(Array(indexer,assembler,rf))
+    //val pipeline = new Pipeline().setStages(Array(indexer,assembler,rf))
+    val pipeline = new Pipeline().setStages(Array(assembler,rf))
     val model = pipeline.fit(train_data)
 
     val predictions = model.transform(test_data)
@@ -65,7 +67,7 @@ object TFIDF{
     // Select (prediction, true label) and compute test error.
     val evaluator = new MulticlassClassificationEvaluator()
       .setLabelCol("target")
-      .setPredictionCol("fake_predict")
+      .setPredictionCol("prediction")
       .setMetricName("accuracy")
     val accuracy = evaluator.evaluate(predictions)
 
@@ -76,10 +78,11 @@ object TFIDF{
   }
   def pipeline_stages():(StringIndexer,VectorAssembler)={
     // Converting labels to label indices
-    val indexer = new StringIndexer().setInputCol("subject").setOutputCol("subject_idx")
+    val indexer = new StringIndexer()//.setInputCol("subject").setOutputCol("subject_idx")
 
     // Joining all the transformed columns
-    val assembler = new VectorAssembler().setInputCols(Array("title_tfidf","text_tfidf","subject_idx")).setOutputCol("features")
+    val assembler = new VectorAssembler().setInputCols(Array("title_tfidf","text_tfidf")).setOutputCol("features")
     (indexer,assembler)
+
   }
 }
