@@ -4,12 +4,12 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{col, lit, udf}
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-object Data{
+object Data {
   val session: SparkSession = SparkSession.builder()
     .master("local")
     .appName("Create DF using CSV")
     .getOrCreate()
-
+  session.sparkContext.setLogLevel("ERROR")
   /*
    * Creating Dataframe from the csv dataset
    */

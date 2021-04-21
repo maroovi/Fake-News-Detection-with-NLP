@@ -1,13 +1,8 @@
-import Data.create_dataframe
-import TFIDF.{nv_prediction, rescaledtextData, text_sw_remover_df}
+import Data.{create_dataframe, preprocess_data}
+import TFIDF.{pipeline_stages, tf_idf}
 import org.apache.spark.ml.PipelineModel
-import org.apache.spark.ml.classification.RandomForestClassificationModel
-import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel, IDF, RegexTokenizer, StopWordsRemover, StringIndexer, VectorAssembler}
-import org.apache.spark.mllib.tree.model.RandomForestModel
-import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.sql.functions.{col, lit, udf}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.col
 
 object ModelLoad extends App {
 
@@ -41,101 +36,19 @@ object ModelLoad extends App {
 
   val df = dfs.union(test_data)
 
-  val test_with_no_punct: Seq[String] = df.collect().map(_.getString(3).replaceAll("https?://\\S+\\s?", "").
-    replaceAll("""[\p{Punct}]""", "")).toSeq
-
-  val countTokens_train:UserDefinedFunction = udf { (words: Seq[String]) => words.length }
-
-  val title_tokenizer = new RegexTokenizer() // Extract tokens from title
-    .setInputCol("title")
-    .setOutputCol("title_words")
-    .setPattern("\\W")
-
-  val title_token_df: DataFrame = title_tokenizer.transform(df)
-
-  title_token_df.select("title","title_words").withColumn("tokens",countTokens_train(col("title_words"))).show(false)
-
-  val title_sw_remover = new StopWordsRemover() // Remove stop words from title
-    .setInputCol("title_words")
-    .setOutputCol("title_sw_removed")
-
-  title_sw_remover.transform(title_token_df)
-
-  val title_sw_remover_df: DataFrame = title_sw_remover.transform(title_token_df).withColumn("tokens", countTokens_train(col("title_sw_removed")))
-
-  val title_count_vectorizer: CountVectorizerModel = new CountVectorizer() // Compute Term frequency from title
-    .setInputCol("title_sw_removed")
-    .setOutputCol("tf_title")
-    .setVocabSize(3)
-    .setMinDF(2)
-    .fit(title_sw_remover_df)
-
-  val title_count_vectorizer_df: DataFrame= title_count_vectorizer.transform(title_sw_remover_df)
-
-  val idf = new IDF().setInputCol("tf_title").setOutputCol("title_tfidf")
-
-  val idfModel = idf.fit(title_count_vectorizer_df)
-
-  val rescaledData = idfModel.transform(title_count_vectorizer_df)
-
-  rescaledData.show(10)
-
-  /// text
-
-
-  val text_tokenizer = new RegexTokenizer() // Extract tokens from text
-    .setInputCol("text")
-    .setOutputCol("text_words")
-    .setPattern("\\W")
-
-  val text_token_df: DataFrame = text_tokenizer.transform(rescaledData)
-
-  text_token_df.select("text","text_words").withColumn("tokens",countTokens_train(col("text_words"))).show(false)
-
-  val text_sw_remover = new StopWordsRemover() // Remove stop words from title
-    .setInputCol("text_words")
-    .setOutputCol("text_sw_removed")
-
-  text_sw_remover.transform(text_token_df)
-
-  val text_sw_remover_df: DataFrame = text_sw_remover.transform(text_token_df).withColumn("tokens", countTokens_train(col("text_sw_removed")))
-
-  val text_count_vectorizer: CountVectorizerModel = new CountVectorizer() // Compute Term frequency from title
-    .setInputCol("text_sw_removed")
-    .setOutputCol("tf_text")
-    .setVocabSize(3)
-    .setMinDF(2)
-    .fit(text_sw_remover_df)
-
-  val text_count_vectorizer_df: DataFrame= text_count_vectorizer.transform(text_sw_remover_df)
-
-  val idf_text = new IDF().setInputCol("tf_text").setOutputCol("text_tfidf")
-
-  val idftextModel = idf_text.fit(text_count_vectorizer_df)
-
-  val rescaledtextData = idftextModel.transform(text_count_vectorizer_df)
-
-
-  ////
-
-  val indexer = new StringIndexer().setInputCol("subject").setOutputCol("subject_idx")
-
-  val assembler = new VectorAssembler().setInputCols(Array("title_tfidf","text_tfidf","subject_idx")).setOutputCol("features")
-
-
-  //// Splitting Data Frame
+  val text_preprocessed = preprocess_data(df,"text")
+  val text_TFIDF = tf_idf(text_preprocessed,"text")
+  val final_df = text_TFIDF.withColumnRenamed("text_tfidf","features")
+  val (indexer,assembler) = pipeline_stages()
+  val title_preprocessed = preprocess_data(text_TFIDF,"title")
+  val title_TFIDF = tf_idf(title_preprocessed,"title")
 
   val nvmodel = PipelineModel.load("src/test/scala/resources/model/myRandomForestClassificationModels")
 
-  val nv_prediction = nvmodel.transform(rescaledtextData)
+  val nv_prediction = nvmodel.transform(title_TFIDF)
 
 
-  //val nv_evaluater = new MulticlassClassificationEvaluator().setLabelCol("target").setPredictionCol("prediction").setMetricName("accuracy")
-
-
-  //val nv_accuracy = nv_evaluater.evaluate(nv_prediction)
 
   nv_prediction.filter((col("date") === "user")).show(true)
 
-  //println(nv_accuracy)
 }
