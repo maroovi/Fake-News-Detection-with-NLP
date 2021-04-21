@@ -1,16 +1,20 @@
-name := """scala-play-forms"""
-organization := "com.pedrorijo91"
+import sbt.Keys.scalaVersion
 
-version := "1.0-SNAPSHOT"
-
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
-
-scalaVersion := "2.12.3"
-
-libraryDependencies += guice
-
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "com.pedrorijo91.controllers._"
-
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "com.pedrorijo91.binders._"
+lazy val root = (project in file("."))
+  .enablePlugins(PlayScala)
+  .settings(
+    name := "Fake-News-Detection-with-NLP",
+    organization := "com.example",
+    version := "0.1",
+    scalaVersion := "2.12.12",
+    libraryDependencies ++= Seq(
+      guice,
+      "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.3" % "test",
+    ),
+    scalacOptions ++= Seq(
+      "-feature",
+      "-deprecation",
+      "-Xfatal-warnings"
+    )
+  )
