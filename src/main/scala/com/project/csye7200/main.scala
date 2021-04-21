@@ -1,5 +1,6 @@
+package com.project.csye7200
 import Data._
-import TFIDF._
+import com.project.csye7200.TFIDF._
 import org.apache.spark.sql.DataFrame
 
 
