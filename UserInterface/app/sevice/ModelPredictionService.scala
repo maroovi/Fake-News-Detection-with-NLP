@@ -36,7 +36,7 @@ class ModelPredictionService extends IModelPredictionService {
     val text_TFIDF = tf_idf(text_preprocessed,"text")
     val title_preprocessed = preprocess_data(text_TFIDF,"title")
     val title_TFIDF = tf_idf(title_preprocessed,"title")
-    val model = PipelineModel.load("src/test/scala/resources/model/RandomForest")
+    val model = PipelineModel.load("MLModel/RandomForest")
 
     val prediction = model.transform(title_TFIDF)
 
