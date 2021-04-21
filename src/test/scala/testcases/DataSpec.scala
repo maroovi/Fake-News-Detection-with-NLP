@@ -1,23 +1,31 @@
 package testcases
-import
+import com.project.csye7200.Data._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import scala.util.{Try, _}
 
 class DataSpec extends AnyFlatSpec with Matchers {
+
   behavior of "Methods in Data"
 
-  it should """match Success(1234) for parse "12" to int and parse "34" to int,with (a:Int,b:Int) => a.toString()+b.toString()""" in {
-    val a1 = "12"
-    val a2 = "34"
-    val t1 = Try(a1.toInt)
-    val t2 = Try(a2.toInt)
+  val inputData = create_dataframe()
 
-    val test = Function.map2(t1, t2)((a: Int, b: Int) => a.toString + b.toString)
-
-    test should matchPattern {
-      case Success("1234") =>
-    }
+  it should "work for entire data" in{
+    val inputData = create_dataframe()
+    val size = inputData.count()
+    println("trainData size: " + size)
+    assert(size > 0)
   }
 
+  it should "work for proceesed text data" in {
+    val processed_data = preprocess_data(inputData,"text")
+    assert(processed_data.columns.contains("text_words"))
+    assert(processed_data.columns.contains("text_sw_removed"))
+  }
+
+  it should "work for processed title data" in {
+    val processed_data = preprocess_data(inputData,"title")
+    assert(processed_data.columns.contains("title_words"))
+    assert(processed_data.columns.contains("title_sw_removed"))
+  }
 }
