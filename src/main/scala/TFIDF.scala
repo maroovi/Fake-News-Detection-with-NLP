@@ -6,7 +6,6 @@ import org.apache.spark.sql.DataFrame
 object TFIDF{
 
   def tf_idf(dataFrame: DataFrame,columnName: String):DataFrame={
-
     // Compute Term frequency vectors
     val count_vectorizer: CountVectorizerModel = new CountVectorizer()
       .setInputCol(columnName+"_sw_removed")
@@ -76,13 +75,77 @@ object TFIDF{
     model.write.overwrite().save("src/test/scala/resources/model/RandomForest")
 
   }
-  def pipeline_stages():(StringIndexer,VectorAssembler)={
-    // Converting labels to label indices
-    val indexer = new StringIndexer()//.setInputCol("subject").setOutputCol("subject_idx")
 
-    // Joining all the transformed columns
-    val assembler = new VectorAssembler().setInputCols(Array("title_tfidf","text_tfidf")).setOutputCol("features")
+  def bulidMLModel(dataFrame: DataFrame,indexer: StringIndexer,assembler: VectorAssembler, mlModel:String): Unit ={
+
+    // Splitting Data Frame
+    val Array(train_data, test_data) = dataFrame.randomSplit(Array(0.7,0.3))
+
+    // Random Forest Classifier
+    val rf = new RandomForestClassifier()
+      .setLabelCol("target")
+      .setFeaturesCol("features")
+      .setNumTrees(20)
+      .setPredictionCol("prediction")
+      .setMaxDepth(7)
+
+    // Naive Bayes Classifier
+    val nb = new NaiveBayes()
+      .setLabelCol("target")
+      .setFeaturesCol("features")
+
+    //val pipeline = new Pipeline().setStages(Array(indexer,assembler,rf))
+    val pipeline = new Pipeline()
+
+    mlModel match {
+      case "rf_simple" => pipeline setStages(Array(rf))
+      case "nb_simple" => pipeline setStages(Array(nb))
+      case "rf_with_title" => pipeline setStages(Array(assembler,rf))
+      case "nb_with_title" => pipeline setStages(Array(assembler,rf))
+      case "rf_with_subject" => pipeline setStages(Array(indexer,assembler,rf))
+      case "nb_with_subject" => pipeline setStages(Array(indexer,assembler,rf))
+    }
+    // Building the ML Model
+    val model = pipeline.fit(train_data)
+
+    val predictions = model.transform(test_data)
+    predictions.show()
+
+    // Select (prediction, true label) and compute test error.
+    val evaluator = new MulticlassClassificationEvaluator()
+      .setLabelCol("target")
+      .setPredictionCol("prediction")
+      .setMetricName("accuracy")
+
+    // Calculating accuracy as per test values
+    val accuracy = evaluator.evaluate(predictions)
+
+    // Print and save as per the model type specified
+    mlModel match {
+      case "rf_simple" => {
+        println("Random Forest test set Accuracy = "+accuracy)
+        model.write.overwrite().save("src/test/scala/resources/model/RandomForest")
+      }
+      case "nb_simple" => {
+        println(s"Naive Bayes test set accuracy = $accuracy")
+        model.write.overwrite().save("src/test/scala/resources/model/NaiveBayes")
+      }
+    }
+  }
+
+  def pipeline_stages(mode:Int):(StringIndexer,VectorAssembler)={
+    val indexer = new StringIndexer()        // Converting labels to label indices
+    val assembler = new VectorAssembler()    // Joining all the transformed columns
+
+    mode match {
+      case 1 =>
+      case 2 =>  assembler setInputCols(Array("title_tfidf","text_tfidf")) setOutputCol("features")
+      case 3 => {
+                  indexer setInputCol("subject") setOutputCol("subject_idx")
+                  assembler setInputCols(Array("title_tfidf","text_tfidf","subject_idx")) setOutputCol("features")
+                }
+    }
+
     (indexer,assembler)
-
   }
 }

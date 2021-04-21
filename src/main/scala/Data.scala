@@ -5,12 +5,14 @@ import org.apache.spark.sql.functions.{col, lit, udf}
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 object Data {
+
+  val session = SparkSession.builder()
+    .master("local")
+    .appName("Create DF using CSV")
+    .getOrCreate()
+  session.sparkContext.setLogLevel("ERROR")
+
   def create_dataframe():DataFrame = {
-    val session = SparkSession.builder()
-      .master("local")
-      .appName("Create DF using CSV")
-      .getOrCreate()
-    session.sparkContext.setLogLevel("ERROR")
 
     val real = session.read
       .options(Map("header" -> "true", "quote" -> "\"", "escape" -> "\""))
@@ -36,16 +38,16 @@ object Data {
   /*
    * Cleaning the data - removing punctuations from the column position specified
    */
-//  def clean_data(dataFrame: DataFrame, position: Int, newColumnName : String):DataFrame={
-//    val test_with_no_punct: Seq[String] = dataFrame.collect().map(_.getString(position).replaceAll("https?://\\S+\\s?", "").
-//      replaceAll("""[\p{Punct}]""", "")).toSeq
-//
-//    val rdd: RDD[String] = session.sparkContext.parallelize(test_with_no_punct)
-//    val rdd_train: RDD[Row] = dataFrame.rdd.zip(rdd).map(r => Row.fromSeq(r._1.toSeq ++ Seq(r._2)))
-//    val df = session.createDataFrame(rdd_train, dataFrame.schema.add(newColumnName, StringType))
-//
-//    df
-//  }
+  def clean_data(dataFrame: DataFrame, position: Int, newColumnName : String):DataFrame={
+    val test_with_no_punct: Seq[String] = dataFrame.collect().map(_.getString(position).replaceAll("https?://\\S+\\s?", "").
+      replaceAll("""[\p{Punct}]""", "")).toSeq
+
+    val rdd: RDD[String] = session.sparkContext.parallelize(test_with_no_punct)
+    val rdd_train: RDD[Row] = dataFrame.rdd.zip(rdd).map(r => Row.fromSeq(r._1.toSeq ++ Seq(r._2)))
+    val df = session.createDataFrame(rdd_train, dataFrame.schema.add(newColumnName, StringType))
+
+    df
+  }
 
   /*
    * Preprocessing of a specified column
@@ -63,7 +65,6 @@ object Data {
     token_df.select(columnName,columnName+"_words").withColumn("tokens",countTokens_train(col(columnName+"_words"))).show()
 
     // Remove stop words
-
     val sw_remover = new StopWordsRemover()
       .setInputCol(columnName+"_words")
       .setOutputCol(columnName+"_sw_removed")
