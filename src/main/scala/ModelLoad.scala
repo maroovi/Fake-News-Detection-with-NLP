@@ -1,4 +1,4 @@
-import Data.{create_dataframe, preprocess_data}
+import Data.preprocess_data
 import TFIDF.{pipeline_stages, tf_idf}
 import org.apache.spark.ml.PipelineModel
 import org.apache.spark.sql.SparkSession
@@ -48,7 +48,7 @@ object ModelLoad extends App {
   val text_preprocessed = preprocess_data(df,"text")
   val text_TFIDF = tf_idf(text_preprocessed,"text")
   val final_df = text_TFIDF.withColumnRenamed("text_tfidf","features")
-  val (indexer,assembler) = pipeline_stages()
+  val (indexer,assembler) = pipeline_stages(2)
   val title_preprocessed = preprocess_data(text_TFIDF,"title")
   val title_TFIDF = tf_idf(title_preprocessed,"title")
 

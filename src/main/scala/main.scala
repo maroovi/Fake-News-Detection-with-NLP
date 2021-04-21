@@ -17,12 +17,16 @@ object main extends App{
   }
 
   val dataFrame = loadData()
-  val (indexer,assembler) = pipeline_stages(2)
 
-//  bulidMLModel(dataFrame,indexer,assembler,"")
+  bulidMLModel(dataFrame,"rf_simple")
+  bulidMLModel(dataFrame,"nb_simple")
+  bulidMLModel(dataFrame,"rf_with_title")
+  bulidMLModel(dataFrame,"nb_with_title")
+  bulidMLModel(dataFrame,"rf_with_subject")
+  bulidMLModel(dataFrame,"nb_with_subject")
 
-  randomForestClassifier(dataFrame,indexer,assembler)
-  naiveBayes(dataFrame,indexer,assembler)
+//  randomForestClassifier(dataFrame,indexer,assembler)
+//  naiveBayes(dataFrame,indexer,assembler)
 
 
 }
