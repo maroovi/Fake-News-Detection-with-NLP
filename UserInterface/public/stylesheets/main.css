@@ -124,6 +124,23 @@ img {
     width: 200px;
     height: 200px;
 }
+
+#verdict {
+    margin-left: 850px;
+    width: 270px;
+    text-align: center;
+    height: 50px;
+    font-size: 30px;
+    margin-top: 300px;
+    border-radius: 5px;
+    display: inline-block;
+    padding: 5px;
+    background: black;
+    color: white;
+    position: absolute;
+    z-index: 1;
+}
+
 .box-area li {
 	position: absolute;
 	display: block;

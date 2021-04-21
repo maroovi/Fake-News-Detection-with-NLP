@@ -37,8 +37,11 @@
         'placeholder -> "News ")
         @select(userForm(""), InputTypesForm.Preferences.values.toSeq.map(pref => pref.toString -> pref.toString),
         '_id -> "dropdown")
-        <input id= "button1" type="submit" value="Scan">
-    </div>
+        <button id= "button1" type="button" onclick="javascript:loadResult(document);">Scan</button>
     }
+    </div>
+
+    <div class="real" id="verdict">
+    </div>
     </body>
 }
