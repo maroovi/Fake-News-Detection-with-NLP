@@ -25,12 +25,10 @@ object TFIDF{
   }
   def naiveBayes(dataFrame: DataFrame,indexer: StringIndexer,assembler: VectorAssembler): Unit ={
     val Array(train_data, test_data) = dataFrame.randomSplit(Array(0.7,0.3))
-    val nb = new NaiveBayes()
-      .setLabelCol("target")
+    val nb = new NaiveBayes().setLabelCol("target").setFeaturesCol("features")
     val pipeline = new Pipeline().setStages(Array(indexer,assembler,nb))
     val model = pipeline.fit(train_data)
 
-    //model.write.overwrite().save("src/test/scala/resources/model/NaiveBayes")
     val predictions = model.transform(test_data)
     predictions.show()
 
@@ -38,9 +36,12 @@ object TFIDF{
       .setLabelCol("target")
       .setPredictionCol("prediction")
       .setMetricName("accuracy")
+
     val accuracy = evaluator.evaluate(predictions)
 
     println(s"Naive Bayes Test set accuracy = $accuracy")
+
+    model.write.overwrite().save("src/test/scala/resources/model/NaiveBayes")
   }
   def randomForestClassifier(dataFrame: DataFrame,indexer: StringIndexer,assembler: VectorAssembler): Unit ={
 
@@ -57,7 +58,7 @@ object TFIDF{
 
     val pipeline = new Pipeline().setStages(Array(indexer,assembler,rf))
     val model = pipeline.fit(train_data)
-    model.write.overwrite().save("src/test/scala/resources/model/RandomForestClassifier")
+
     val predictions = model.transform(test_data)
     predictions.show()
 
@@ -69,6 +70,8 @@ object TFIDF{
     val accuracy = evaluator.evaluate(predictions)
 
     println("Random Forest test set Accuracy = "+accuracy)
+
+    model.write.overwrite().save("src/test/scala/resources/model/RandomForest")
 
   }
   def pipeline_stages():(StringIndexer,VectorAssembler)={
