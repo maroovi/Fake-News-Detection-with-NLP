@@ -2,7 +2,9 @@
 GET     /                           controllers.BasicController.index
 
 GET     /inputTypesForm             controllers.BasicController.inputTypesForm
-POST    /inputTypesForm             controllers.BasicController.inputTypesFormPost
+POST    /inputTypesFormPost         controllers.BasicController.inputTypesFormPost
+
+GET     /analysisPost               controllers.BasicController.analysisPost
 
 
 # Map static resources from the /public folder to the /assets URL path

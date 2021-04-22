@@ -1,14 +1,11 @@
-function myFunction() {
-  alert("The form was submitted");
-}
 /**
  * This functions loads the result in the HTML component.
  */
 function loadResult(doc){
-  jQuery.get( "http://localhost:9000/rnd/rxbat", function(
-      response ) {
+  jQuery.get("/InputTypesFormPost", function(response) {
+    alert(response.prediction);
     doc.getElementById("verdict").value = "FALSE";
   }).fail(function(e) {
-    alert('Wops! We was not able to call http://localhost:9000/rnd/rxba. Error: ' + e.statusText);
+    alert('Wops! We was not able to call. Error: ' + e.statusText);
         });
 }

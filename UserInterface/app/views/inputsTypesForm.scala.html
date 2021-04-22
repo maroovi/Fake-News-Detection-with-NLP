@@ -31,13 +31,14 @@
     </div>
 
     <div class="container">
-    @form(action = routes.BasicController.inputTypesFormPost) {
+
+    @form(action = routes.BasicController.analysisPost) {
         @inputText(userForm(""),
         '_id -> "search",
         'placeholder -> "News ")
         @select(userForm(""), InputTypesForm.Preferences.values.toSeq.map(pref => pref.toString -> pref.toString),
         '_id -> "dropdown")
-        <button id= "button1" type="submit" onclick="javascript:loadResult(document);">Scan</button>
+        <button id= "button1" type="submit">Scan</button>
     }
     </div>
 
