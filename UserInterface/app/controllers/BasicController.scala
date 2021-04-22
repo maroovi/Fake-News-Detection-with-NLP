@@ -61,7 +61,7 @@ class BasicController @Inject()(cc: ControllerComponents) extends AbstractContro
 
     val test = session.read
       .options(Map("header" -> "true", "quote" -> "\"", "escape" -> "\""))
-      .csv("src/test/scala/resources/datasets/test.csv")
+      .csv("MLModel/test.csv")
 
     val dfs = session.createDataFrame(Seq(
       (text,text,"","user",null.asInstanceOf[Integer])
@@ -73,7 +73,27 @@ class BasicController @Inject()(cc: ControllerComponents) extends AbstractContro
     val text_TFIDF = tf_idf(text_preprocessed,"text")
     val title_preprocessed = preprocess_data(text_TFIDF,"title")
     val title_TFIDF = tf_idf(title_preprocessed,"title")
-    val model = PipelineModel.load("MLModel/RandomForest")
+    val model:PipelineModel = PipelineModel.load(
+      model_type match {
+        case "rf" => {
+          "MLModel/RandomForest"
+        }
+        case "nb" => {
+          "MLModel/NaiveBayes"
+        }
+        case "rf_with_title" => {
+          "MLModel/RandomForestTT"
+        }
+        case "nb_with_title" => {
+          "MLModel/NaiveBayesTT"
+        }
+        case "rf_with_subject" => {
+          "MLModel/RandomForestSTT"
+        }
+        case "nb_with_subject" => {
+          "MLModel/NaiveBayesSTT"
+        }
+      })
 
     val prediction = model.transform(title_TFIDF)
 
