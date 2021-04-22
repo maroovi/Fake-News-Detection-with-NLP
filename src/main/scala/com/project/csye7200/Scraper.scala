@@ -1,4 +1,5 @@
-/*import twitter4j._
+package com.project.csye7200
+import twitter4j._
 import twitter4j.auth.Authorization
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
@@ -85,4 +86,4 @@ object Scrapper {
     ssc.awaitTermination()
   }
 }
- */
+
