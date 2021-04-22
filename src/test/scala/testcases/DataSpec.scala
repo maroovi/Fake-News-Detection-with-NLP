@@ -2,7 +2,6 @@ package testcases
 import com.project.csye7200.Data._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import scala.util.{Try, _}
 
 class DataSpec extends AnyFlatSpec with Matchers {
 
@@ -11,7 +10,6 @@ class DataSpec extends AnyFlatSpec with Matchers {
   val inputData = create_dataframe()
 
   it should "work for entire data" in{
-    val inputData = create_dataframe()
     val size = inputData.count()
     println("trainData size: " + size)
     assert(size > 0)
