@@ -31,15 +31,15 @@
     </div>
 
     <div class="container">
+        <form action="@routes.BasicController.analysisPost" method="post">
+            <input name="news" type="text">
+            <select name="model" id="cars">
+                <option value="rf">Random Forest</option>
+                <option value="nb">Naive Bayes</option>
+            </select>
+            <button id= "button1" type="submit" >Scan</button>
+        </form>
 
-    @form(action = routes.BasicController.analysisPost) {
-        @inputText(userForm(""),
-        '_id -> "search",
-        'placeholder -> "News ")
-        @select(userForm(""), InputTypesForm.Preferences.values.toSeq.map(pref => pref.toString -> pref.toString),
-        '_id -> "dropdown")
-        <button id= "button1" type="submit">Scan</button>
-    }
     </div>
 
     <div class="real" id="verdict">

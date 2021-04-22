@@ -1,15 +1,16 @@
 package controllers
 
-import javax.inject.Inject
-import javax.inject.Singleton
-import models.InputTypesForm
+import models.{InputTypesForm, ModelPrediction}
 import org.apache.spark.ml.PipelineModel
-import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel, IDF, RegexTokenizer, StopWordsRemover, StringIndexer, VectorAssembler}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.ml.feature._
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.{col, udf}
-import play.api.libs.Files
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import play.api.data.Form
+import play.api.data.Forms.{mapping, text}
 import play.api.mvc._
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class BasicController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with play.api.i18n.I18nSupport {
@@ -34,10 +35,18 @@ class BasicController @Inject()(cc: ControllerComponents) extends AbstractContro
     )
   }
 
+  val modelForm:Form[ModelPrediction] = Form(
+    mapping (
+      "news" -> text,
+      "model"-> text
+    ) (ModelPrediction.apply)(ModelPrediction.unapply)
+  )
+
   def analysisPost() = Action { implicit request =>
-    val formData: InputTypesForm = InputTypesForm.form.bindFromRequest.get // Careful: BasicForm.form.bindFromRequest returns an Option
-    val res = formData.news
-    Ok(res) // just returning the data because it’s an example :)
+    val data = modelForm.bindFromRequest.get
+    //val jsonData = model_prediction(data.news,data.model)
+
+    Ok("Hello")
   }
 
 

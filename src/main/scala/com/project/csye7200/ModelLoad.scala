@@ -57,20 +57,20 @@ object ModelLoad extends App {
 
   val nvmodel = PipelineModel.load("src/test/scala/resources/model/NaiveBayes")
 
-  val model = PipelineModel.load("src/test/scala/resources/model/RandomForest")
+  //val model = PipelineModel.load("src/test/scala/resources/model/RandomForest")
 
   val nv_prediction = nvmodel.transform(title_TFIDF)
 
-  val prediction = model.transform(title_TFIDF)
+  //val prediction = model.transform(title_TFIDF)
 
 
   nv_prediction.filter((col("date") === "user")).show(true)
   val nv_json = nv_prediction.filter((col("date") === "user")).select("prediction","probability").toJSON
-  println("RF ******************")
-  prediction.filter((col("date") === "user")).show(true)
-  val rf_json = prediction.filter((col("date") === "user")).select("prediction","probability").toJSON
+ // println("RF ******************")
+ // prediction.filter((col("date") === "user")).show(true)
+ // val rf_json = prediction.filter((col("date") === "user")).select("prediction","probability").toJSON
 
   nv_json.show(false)
-  rf_json.show(false)
+
 
 }

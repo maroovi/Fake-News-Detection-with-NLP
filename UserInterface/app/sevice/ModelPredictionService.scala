@@ -36,7 +36,27 @@ class ModelPredictionService extends IModelPredictionService {
     val text_TFIDF = tf_idf(text_preprocessed,"text")
     val title_preprocessed = preprocess_data(text_TFIDF,"title")
     val title_TFIDF = tf_idf(title_preprocessed,"title")
-    val model = PipelineModel.load("MLModel/RandomForest")
+    val model:PipelineModel = PipelineModel.load(
+    model_type match {
+      case "rf_simple" => {
+        "src/test/scala/resources/model/RandomForest"
+      }
+      case "nb_simple" => {
+       "src/test/scala/resources/model/NaiveBayes"
+      }
+      case "rf_with_title" => {
+       "src/test/scala/resources/model/RandomForestTT"
+      }
+      case "nb_with_title" => {
+        "src/test/scala/resources/model/NaiveBayesTT"
+      }
+      case "rf_with_subject" => {
+        "src/test/scala/resources/model/RandomForestSTT"
+      }
+      case "nb_with_subject" => {
+        "src/test/scala/resources/model/NaiveBayesSTT"
+      }
+    })
 
     val prediction = model.transform(title_TFIDF)
 
