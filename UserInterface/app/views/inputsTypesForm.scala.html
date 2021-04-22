@@ -32,8 +32,16 @@
 
     <div class="container">
         <form action="@routes.BasicController.analysisPost" method="post">
-            <input name="news" type="text">
-            <select name="model" id="cars">
+            <input id="search" name="news" type="text" placeholder="News">
+            <select name="subject" id="drop">
+                <option value="none">None</option>
+                <option value="us">US News</option>
+                <option value="world">World News</option>
+                <option value="politics">Politics</option>
+                <option value="Government_News">Government News</option>
+                <option value="Middle_East">Middle East</option>
+            </select>
+            <select name="model" id="dropdown">
                 <option value="rf">Random Forest</option>
                 <option value="nb">Naive Bayes</option>
             </select>
@@ -42,7 +50,5 @@
 
     </div>
 
-    <div class="real" id="verdict">
-    </div>
     </body>
 }

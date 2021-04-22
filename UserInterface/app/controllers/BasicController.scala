@@ -38,19 +38,19 @@ class BasicController @Inject()(cc: ControllerComponents) extends AbstractContro
   val modelForm:Form[ModelPrediction] = Form(
     mapping (
       "news" -> text,
+      "subject" -> text,
       "model"-> text
     ) (ModelPrediction.apply)(ModelPrediction.unapply)
   )
 
   def analysisPost() = Action { implicit request =>
     val data = modelForm.bindFromRequest.get
-    //val jsonData = model_prediction(data.news,data.model)
-
+    //val jsonData = model_prediction(data.news,data.model,data.subject)
     Ok("Hello")
   }
 
 
-  def model_prediction(text: String,model_type: String):String={
+  def model_prediction(text: String,model_type: String,subject:String):String={
 
     val session = SparkSession.builder()
       .master("local")
@@ -75,23 +75,13 @@ class BasicController @Inject()(cc: ControllerComponents) extends AbstractContro
     val title_TFIDF = tf_idf(title_preprocessed,"title")
     val model:PipelineModel = PipelineModel.load(
       model_type match {
-        case "rf" => {
-          "MLModel/RandomForest"
+        case "rf" => subject match{
+          case "None" =>"MLModel/RandomForestSTT"
+          case _ =>   "MLModel/RandomForest"
         }
-        case "nb" => {
-          "MLModel/NaiveBayes"
-        }
-        case "rf_with_title" => {
-          "MLModel/RandomForestTT"
-        }
-        case "nb_with_title" => {
-          "MLModel/NaiveBayesTT"
-        }
-        case "rf_with_subject" => {
-          "MLModel/RandomForestSTT"
-        }
-        case "nb_with_subject" => {
-          "MLModel/NaiveBayesSTT"
+        case "nb" => subject match {
+          case "None" => "MLModel/NaiveBayes"
+          case _ =>      "MLModel/NaiveBayesSTT"
         }
       })
 

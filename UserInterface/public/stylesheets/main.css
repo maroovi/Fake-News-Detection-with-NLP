@@ -27,7 +27,7 @@ body {
     margin-left: 190px;
     list-style-type: none;
     padding: 0;
-    width: 45%;
+    width: 60%;
     height: 300px;
     background: #DCDCDC;
     border-radius: 10px;
@@ -47,6 +47,18 @@ body {
     padding: 5px;
     }
 
+#drop {
+    width: 170px;
+    height: 50px;
+    padding: 4px;
+    font-size: 20px;
+    text-align: center;
+    border-radius: 5px;
+    border-color: white;
+    display: inline-block;
+    font-size: 20px;
+    padding: 5px;
+    }
 
 #dropdown {
     width: 170px;
