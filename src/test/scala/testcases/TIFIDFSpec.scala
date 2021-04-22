@@ -6,24 +6,27 @@ import org.scalatest.matchers.should.Matchers
 class TIFIDFSpec extends AnyFlatSpec with Matchers {
 
   behavior of "Methods in TFIDF"
+  val df = create_dataframe()
+  val preprocessed = preprocess_data(df,"text")
+  val textidf = tf_idf(preprocessed,"text")
 
-  val textidf = tf_idf(create_dataframe(),"text")
+  val preprocessed_title = preprocess_data(df,"title")
+  val titleidf = tf_idf(preprocessed_title,"title")
 
-  val titleidf = tf_idf(create_dataframe(),"title")
+  val preprocessed_title_text = preprocess_data(textidf,"title")
+  val titleidf_advanced = tf_idf(preprocessed_title_text,"title")
 
-  val titleidf_advanced = tf_idf(textidf,"title")
-
-  it should "The tf_idf should produce a dataframe with two columns below for text" in {
+  it should "contain text count vectorized and tfidf columns" in {
     assert(textidf.columns.contains("text_tfidf"))
     assert(textidf.columns.contains("text_ct_vectorized"))
   }
 
-  it should "The tf_idf should produce a dataframe with two columns below for title"  in {
+  it should "contain title count vectorized and tfidf columns"  in {
     assert(titleidf.columns.contains("title_tfidf"))
     assert(titleidf.columns.contains("title_ct_vectorized"))
   }
 
-  it should "when the textidf output containing the text idf columns is passed it should produce a dataframe with below columns in the output dataframe" in {
+  it should "contain text and title count vectorized and tfidf columns" in {
     assert(titleidf_advanced.columns.contains("text_tfidf"))
     assert(titleidf_advanced.columns.contains("text_ct_vectorized"))
     assert(titleidf_advanced.columns.contains("title_tfidf"))
@@ -31,7 +34,7 @@ class TIFIDFSpec extends AnyFlatSpec with Matchers {
   }
 
 
-  it should "the pipeline stage would produce a tuple of indexer and assembler column" in {
+  it should "produce a string indexer and vector assembler" in {
     val (indexer,assembler) = pipeline_stages(3)
     assert(indexer != null)
     assert(assembler != null)
