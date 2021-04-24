@@ -13,8 +13,9 @@ lazy val root = (project in file("."))
       "org.scalatest" %% "scalatest" % "3.2.3" % "test",
       "org.apache.spark" %% "spark-core" % "2.4.0",
       "org.apache.spark" %% "spark-mllib" % "2.4.0",
-      "org.apache.spark" %% "spark-sql" % "2.4.0",
+      "org.apache.spark" %% "spark-sql" % "2.4.0"
     ),
+    dependencyOverrides += "com.google.guava" % "guava" % "15.0",
     scalacOptions ++= Seq(
       "-feature",
       "-deprecation",

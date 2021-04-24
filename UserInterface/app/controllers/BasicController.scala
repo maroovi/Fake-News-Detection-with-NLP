@@ -46,7 +46,7 @@ class BasicController @Inject()(cc: ControllerComponents) extends AbstractContro
   def analysisPost() = Action { implicit request =>
     val data = modelForm.bindFromRequest.get
     //val jsonData = model_prediction(data.news,data.model,data.subject)
-    Ok("Hello")
+    Ok(data.news+" "+data.subject+" "+data.model)
   }
 
 
